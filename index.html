@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[name] Mensahero/a</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+   <div class="form-box">
+  <h1>[name] Mensahero/a</h1>
+  <form id="message-form">
+    <label for="receiver-name">Receiver's Name:</label>
+    <input type="text" id="receiver-name" name="receiver-name" required>
+    <label for="sender-name">Sender's Name:</label>
+    <input type="text" id="sender-name" name="sender-name" required>
+    <label for="facebook-link">Facebook Link of Receiver:</label>
+    <a href="#" id="facebook-link-wrapper">
+      <input type="text" id="facebook-link" name="facebook-link" required>
+    </a>
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" rows="5" required></textarea>
+    <input type="submit" value="Submit">
+    <button id="view-messages-button">></button>
+  <ul id="message-list"></ul>
+  </form>
+  <label for="admin-password">Admin Password (to delete message):</label>
+    <input type="password" id="admin-password" name="admin-password">
+    <button id="login-button">Login</button>
+    <p>Created by: <b>Chael</b></p>
+</div>
+  <script>
+    let isAdmin = false;
+const loginButton = document.getElementById('login-button');
+const adminPasswordInput = document.getElementById('admin-password');
+
+loginButton.addEventListener('click', () => {
+  const adminPassword = adminPasswordInput.value;
+  if (adminPassword === 'pass') {
+    isAdmin = true;
+    alert('Logged in as admin');
+  } else {
+    isAdmin = false;
+    alert('Incorrect admin password');
+  }
+});
+    // JavaScript code to handle form submission and display messages
+    const messageForm = document.getElementById('message-form');
+    const messageList = document.getElementById('message-list');
+    const viewMessagesButton = document.getElementById('view-messages-button');
+    let messagesDisplayed = false;
+
+    messageForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // prevent form submission
+
+      // Get form values
+      const receiverName = document.getElementById('receiver-name').value;
+      const senderName = document.getElementById('sender-name').value;
+      const facebookLink = document.getElementById('facebook-link').value;
+      const message = document.getElementById('message').value;
+
+      // Create message object
+      const newMessage = {
+        receiverName,
+        senderName,
+        facebookLink,
+        message
+      };
+
+      // Save message to local storage
+      let messages = JSON.parse(localStorage.getItem('messages')) || [];
+      messages.push(newMessage);
+      localStorage.setItem('messages', JSON.stringify(messages));
+
+      // Clear form
+      messageForm.reset();
+
+      // Display messages
+      displayMessages();
+    });
+
+    viewMessagesButton.addEventListener('click', () => {
+      messagesDisplayed = !messagesDisplayed;
+      displayMessages();
+    });
+
+    function displayMessages() {
+      // Clear message list
+      messageList.innerHTML = '';
+
+      // Get messages from local storage
+      let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+      // Display messages
+      if (messagesDisplayed) {
+  messages.forEach((message, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>Receiver's Name:</strong> ${message.receiverName}<br>
+      <strong>Sender's Name:</strong> ${message.senderName}<br>
+      <strong>Facebook Link of Receiver:</strong> ${message.facebookLink}<br>
+      <strong>Message:</strong> ${message.message}<br>
+      ${isAdmin ? '<button onclick="deleteMessage(' + index + ')">Delete</button>' : ''}
+    `;
+    messageList.appendChild(li);
+  });
+        viewMessagesButton.textContent = 'Hide Messages';
+      } else {
+        viewMessagesButton.textContent = 'View Messages';
+      }
+    }
+
+    function deleteMessage(index) {
+      // Get messages from local storage
+      let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+      // Remove message at index
+      messages.splice(index, 1);
+
+      // Save messages to local storage
+      localStorage.setItem('messages', JSON.stringify(messages));
+
+      // Display messages
+      displayMessages();
+    }
+
+    // Display messages on page load
+    displayMessages();
+  </script>
+</body>
+  
